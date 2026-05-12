@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import miConexion from './db.js';
 
 const app = express();
 app.use(cors());
@@ -32,7 +33,7 @@ app.post("/registro", (req, res) =>{
     } else{
 
         res.status(400).json({
-            error : "Correo y contraseña no requeridos o no encotrados"
+            error : "Correo y contraseña requeridos"
         });
     }
 });
