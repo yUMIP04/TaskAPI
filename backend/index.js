@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import miConexion from './db.js';
+import connection from './db.js';
 
 const app = express();
 app.use(cors());
@@ -17,18 +17,22 @@ app.get("/", (req, res) => {
 
 
 
-/*🌟 RUTA DEL SERVIDOR */
+/*🌟 RUTA PARA REGISTRO */
 
-app.post("/registro", (req, res) =>{
+app.post("/registro", async (req, res) =>{
 
     const correo_user = req.body.correo;
     const pass_user = req.body.password;
 
     if(correo_user && pass_user){
 
-        res.json({
+        const registrar = 'INSERT INTO Usuarios (correo, password) VALUES(?, ?)';
+        const [resultado] = await connection.execute(registrar, [correo_user,pass_user]);
+
+        res.status(201).json({
+            id:resultado.insertId,
             correo : correo_user,
-            contraseña : pass_user 
+           
         });
     } else{
 
