@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import connection from './db.js';
+import bcrypt from "bcryptjs";
 
 const app = express();
 app.use(cors());
@@ -25,9 +26,12 @@ app.post("/registro", async (req, res) =>{
     const pass_user = req.body.password;
 
     if(correo_user && pass_user){
+       const saltRounds = 10;
+       
+       const passwordEncriptado = await bcrypt.hash(pass_user, saltRounds);
 
         const registrar = 'INSERT INTO Usuarios (correo, password) VALUES(?, ?)';
-        const [resultado] = await connection.execute(registrar, [correo_user,pass_user]);
+        const [resultado] = await connection.execute(registrar, [correo_user,passwordEncriptado]);
 
         res.status(201).json({
             id:resultado.insertId,
