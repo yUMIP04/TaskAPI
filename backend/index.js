@@ -67,7 +67,8 @@ app.post("/registro", async (req, res) =>{
             if(coinciden){
 
                 res.json({
-                    mensaje: "La contraseña coincide"
+                    mensaje: "La contraseña coincide",
+                    correo: correo_usuario
                 }).status(200);
             } else{
 
