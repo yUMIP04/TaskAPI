@@ -23,6 +23,19 @@ console.log("🥳 Se logro la conexion a la BD");
          password VARCHAR(255) NOT NULL)`);
 
          console.log("📋 La tabla Usuarios se creo correctamente");
+
+    /*🌟tabla tareas */
+
+    const tabla_Tarea = await connection.query(`
+        CREATE TABLE IF NOT EXISTS tareas(
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        texto VARCHAR(255) NOT NULL,
+        completada VARCHAR(255) NOT NULL,
+        usuario_id INT,
+        FOREIGN KEY(usuario_id) REFERENCES Usuarios(id)
+        )
+        `);
+        console.log("📋 La tabla tareas se creo correctamente");
 }catch(e){
 
     console.error(`Hubo un error al conectarse a la BD: ${e}`);

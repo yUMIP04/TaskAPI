@@ -1,6 +1,7 @@
 const formulario = document.getElementById("formulario-Login");
 const CorreoFormulario = document.getElementById("correo");
 const PassFormulario = document.getElementById("password");
+const notificacion = document.getElementById("notification");
 
 formulario.addEventListener("submit", async (event) =>{
 
@@ -15,7 +16,19 @@ formulario.addEventListener("submit", async (event) =>{
         
     const respuestaServidor = await FormularioLogin(valorCorreo, valorPass);
 
+    /*🌟 validacion de contraseña */
+    if(respuestaServidor.mensaje == "La contraseña coincide"){
+        
+    notificacion.textContent= "Sesion exitosa";
+    notificacion.style.color = "green";
+    window.location.href = "dashboard.html"
+
     console.log("Respuesta del Servidor: ", respuestaServidor)
+    } else{
+        notificacion.textContent= "Sesion negada";
+    notificacion.style.color = "red";
+    }
+    
     }catch(e){
         console.error(`No se pudo conectar al Servidor: ${e}`);
     }

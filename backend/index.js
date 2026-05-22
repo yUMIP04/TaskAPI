@@ -46,7 +46,7 @@ app.post("/registro", async (req, res) =>{
     }
 });
 
-    /*RUTA PARA LOGIN */
+    /*🌟RUTA PARA LOGIN */
 
     app.post("/login", async (req,res) =>{
 
@@ -83,6 +83,16 @@ app.post("/registro", async (req, res) =>{
             }).status(401)
         }
     })
+
+/*🌟 RUTA PARA DASHBOARD */
+
+app.post("/tareas", async (req, res) =>{
+
+    const texto_tarea = req.body.texto;
+    const id_usuario = req.body.usuario_id;
+
+
+})
 
 /*🌟 Escuchar servidor */
 app.listen(3000, () => {
