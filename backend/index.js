@@ -91,6 +91,20 @@ app.post("/tareas", async (req, res) =>{
     const texto_tarea = req.body.texto;
     const id_usuario = req.body.usuario_id;
 
+    const estado = "Pendiente";
+    const consulta_tareaInsert = 'INSERT INTO tareas (texto, completada, usuario_id) VALUES( ?, ?,?)';
+    const insert_tarea =await connection.execute(consulta_tareaInsert, [texto_tarea, estado,id_usuario]);
+
+    if (insert_tarea){
+
+        res.json({
+            mensaje:"Se creo la tarea exitosamente"
+        }).status(201);
+    } else{
+        res.json({
+            error : "No se creo la tarea"
+        }).status(401)
+    }
 
 })
 
