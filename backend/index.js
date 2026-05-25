@@ -15,9 +15,6 @@ app.get("/", (req, res) => {
 
 });
 
-
-
-
 /*🌟 RUTA PARA REGISTRO */
 
 app.post("/registro", async (req, res) =>{
@@ -53,7 +50,7 @@ app.post("/registro", async (req, res) =>{
         const correo_usuario = req.body.correo;
         const pass_usuario = req.body.password;
 
-        const sql_consulta = 'SELECT password FROM Usuarios WHERE correo = ? LIMIT 1';
+        const sql_consulta = 'SELECT id, password FROM Usuarios WHERE correo = ? LIMIT 1';
 
         const [consulta_correo] = await connection.execute(sql_consulta, [correo_usuario]);
 
@@ -68,7 +65,8 @@ app.post("/registro", async (req, res) =>{
 
                 res.json({
                     mensaje: "La contraseña coincide",
-                    correo: correo_usuario
+                    correo: correo_usuario,
+                    usuario_id:consulta_correo[0].id
                 }).status(200);
             } else{
 
@@ -106,6 +104,31 @@ app.post("/tareas", async (req, res) =>{
         }).status(401)
     }
 
+})
+
+/*🌟OBTENER TAREAS */
+
+app.get("/tareas/:usuarioId", async (req,res) =>{
+
+    const id_usuario = req.params.usuarioId;
+    
+    const consulta_tareas = 'SELECT texto FROM tareas WHERE usuario_id = ?';
+
+    try{
+
+        const [resultados] = await connection.execute(consulta_tareas, [id_usuario]);
+
+        res.status(200).json({
+            mensaje: `Se encontraron tus tareas`,
+            tareas: resultados
+        })
+
+    }catch(e){
+        res.status(404).json({
+            error:`Hubo un error al Obtener tus tareas: ${e}`
+        });
+    }
+    
 })
 
 /*🌟 Escuchar servidor */
