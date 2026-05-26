@@ -131,6 +131,27 @@ app.get("/tareas/:usuarioId", async (req,res) =>{
     
 })
 
+/*🌟ELIMINAR TAREAS */
+
+app.delete("/tareas/:id", async (req, res) =>{
+
+    const id_tarea = req.params.id;
+
+    try{
+        const sql_consulta = 'DELETE FROM tareas WHERE id = ?'
+
+    const [resultado] = await connection.execute(sql_consulta, [id_tarea]);
+
+    res.status(200).json({
+        mensaje: "Se elimino la tarea con exito"
+    });
+    }catch(e){
+        res.status(404).json({
+            error:`No se elimino la tarea de manera correcta: ${e}`
+        });
+    }
+})
+
 /*🌟 Escuchar servidor */
 app.listen(3000, () => {
 
