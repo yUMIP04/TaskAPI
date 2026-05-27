@@ -18,6 +18,8 @@ formulario.addEventListener("submit", async (event) =>{
 
     /*🌟 validacion de contraseña */
     if(respuestaServidor.mensaje == "La contraseña coincide"){
+
+        localStorage.setItem("usuarioId", respuestaServidor.usuario_id);
         
     notificacion.textContent= "Sesion exitosa";
     notificacion.style.color = "green";

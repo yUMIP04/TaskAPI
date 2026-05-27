@@ -4,45 +4,87 @@ const div_Tareas = document.getElementById("list-tareas");
 const ul = document.getElementById("contenedor-li");
 
 /*🌟Funcion para pintar tareas */
-function Pintar_Tareas(txt){
-     try{
-        const valor_tarea = txt.value;
-        const btn_eliminar = document.createElement("button");
+function Pintar_Tareas(texto, id_Tarea = null) {
+    try {
+        if (texto) {
+            const tarea = document.createElement("li");
+            const btn_eliminar = document.createElement("button");
+            
+            btn_eliminar.textContent = "Eliminar";
+            tarea.textContent = texto + " "; 
+            
+            tarea.appendChild(btn_eliminar);
+            ul.appendChild(tarea);
+            div_Tareas.appendChild(ul);
 
-        div_Tareas.innerHTML = "";
+            /*BOTON ELIMINAR */
+            btn_eliminar.addEventListener("click", async () => {
+                if (id_Tarea) {
+                   
+                    console.log("Eliminando de la BD la tarea ID:", id_Tarea);
+                    const respuesta = await EliminarTarea(id_Tarea);
+                    
+                    if (respuesta && respuesta.mensaje === "Se eliminó la tarea con éxito") {
+                        tarea.remove();
+                    }
+                } else {
+                    
+                    tarea.remove();
+                }
+            });
 
-       if(valor_tarea){
-        const tarea = document.createElement("li");
-        
-        btn_eliminar.textContent = "Eliminar";
-        tarea.textContent = valor_tarea;
-        tarea.append(btn_eliminar);
-        ul.appendChild(tarea);
-        div_Tareas.appendChild(ul);
-
-        /*BOTON ELIMINAR */
-
-        btn_eliminar.addEventListener("click", async () => {
-           await EliminarTarea(tarea.id);
-        })
-        
-        txt.value = "";
-       } else{
-        alert("El campo esta vacio");
-       }
-    }catch(e){
-        console.error(`Hubo un error: ${e}`);
+        } else {
+            alert("El campo está vacío");
+        }
+    } catch (e) {
+        console.error(`Hubo un error al pintar: ${e}`);
     }
 }
 
-/*Boton para agregar tareas */
-btn_agregar.addEventListener("click", () =>{
+/* 🌟 Cargar tareas del servidor al iniciar */
+document.addEventListener("DOMContentLoaded", async () => {
+    const id_usuario_logueado = localStorage.getItem("usuarioId");
 
-    Pintar_Tareas(nueva_tarea);
+    if (id_usuario_logueado) {
+        const resultado = await PintarTareas(id_usuario_logueado);
+
+        if (resultado && resultado.tareas) {
+            
+            div_Tareas.innerHTML = "";
+            ul.innerHTML = ""; 
+
+           
+            resultado.tareas.forEach(tarea => {
+                Pintar_Tareas(tarea.texto, tarea.id); 
+            });
+        }
+    } else {
+        alert("No has iniciado sesión, regresando al login...");
+        window.location.href = "index.html";
+    }
 });
 
+/*Boton para agregar */
+btn_agregar.addEventListener("click", async () => {
 
-/*FUNCIONES DE LAS APIS */
+
+    const valor_txt = nueva_tarea.value;
+    const idUsuarioLogueado = localStorage.getItem("usuarioId");
+
+    if(valor_txt.trim() !== ""){
+        const respuesta = await AgregarTareas(valor_txt, idUsuarioLogueado);
+
+        if(respuesta && respuesta.mensaje === "Se creo la tarea exitosamente"){
+            Pintar_Tareas(valor_txt, respuesta.id_tarea);
+             nueva_tarea.value = "";
+        }
+    } else{
+        alert("El campo esta vacio");
+    }
+   
+});
+
+/*🌟FUNCIONES DE LAS APIS */
 
 async function EliminarTarea(id_Tarea) {
     try{
@@ -58,6 +100,7 @@ async function EliminarTarea(id_Tarea) {
     }
 }
 
+/*pintar tareas */
 async function PintarTareas(usuario_id) {
     
     try{
@@ -69,5 +112,30 @@ async function PintarTareas(usuario_id) {
         return datos;
     }catch(e){
         console.error(`Hubo un erro al obtener las tareas`);
+    }
+}
+
+/*agregar tareas */
+
+async function AgregarTareas(texto, usuarioID) {
+    
+    try{
+
+        const APITareas = await fetch('http://localhost:3000/tareas',{
+            method: 'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+
+            body:JSON.stringify({
+                texto:texto, 
+                usuario_id:usuarioID})
+        });
+
+        const datos = await APITareas.json();
+
+        return datos;
+    }catch(e){
+        console.error(`Hubo un error al agregar la tarea: ${e}`);
     }
 }
