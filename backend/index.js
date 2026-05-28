@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import connection from './db.js';
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken"
 
+const CLAVE_SECRETA =  "VictoriaGalletaLaneyYumiLunaBrisaYokoYEMOreoWaltKATSUMOTO"
 const app = express();
 app.use(cors());
 
@@ -61,12 +63,20 @@ app.post("/registro", async (req, res) =>{
             /*validacion de contraseña */
 
             const coinciden = await bcrypt.compare(pass_usuario, consulta_correo[0].password);
+
+            
             if(coinciden){
+                const payload = {
+                 correo: correo_usuario,
+                    usuario_id:consulta_correo[0].id
+            }
+
+            const token = jwt.sign(payload, CLAVE_SECRETA, {expiresIn:'2h'} )
 
                 res.json({
                     mensaje: "La contraseña coincide",
                     correo: correo_usuario,
-                    usuario_id:consulta_correo[0].id
+                    token:token
                 }).status(200);
             } else{
 
@@ -86,13 +96,30 @@ app.post("/registro", async (req, res) =>{
 
 app.post("/tareas", async (req, res) =>{
 
+    try{
+
+    
+
     const texto_tarea = req.body.texto;
-    const id_usuario = req.body.usuario_id;
+
+    const token = req.body.token;
+
+    if(!token || !texto_tarea){
+
+        return res.status(400).json({
+            error : "Falta uno de los datos (token o tarea)"
+        })
+    }
+
+    const datos_token = jwt.verify(token, CLAVE_SECRETA);
+
+    const id_usuario = datos_token.id;
 
     const estado = "Pendiente";
     const consulta_tareaInsert = 'INSERT INTO tareas (texto, completada, usuario_id) VALUES( ?, ?,?)';
     const insert_tarea =await connection.execute(consulta_tareaInsert, [texto_tarea, estado,id_usuario]);
 
+    
     if (insert_tarea){
 
         res.json({
@@ -102,6 +129,13 @@ app.post("/tareas", async (req, res) =>{
         res.json({
             error : "No se creo la tarea"
         }).status(401)
+    }
+    }catch(e){ 
+
+        console.error(e);
+        return res.status(401).json({
+            error:"Token invalido, expirado o error en el servidor"
+        })
     }
 
 })
