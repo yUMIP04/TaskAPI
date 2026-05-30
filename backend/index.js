@@ -58,7 +58,7 @@ app.post("/registro", async (req, res) =>{
 
         if(consulta_correo.length > 0){
 
-            res.status(200);
+            /*res.status(200);*/
 
             /*validacion de contraseña */
 
@@ -68,27 +68,27 @@ app.post("/registro", async (req, res) =>{
             if(coinciden){
                 const payload = {
                  correo: correo_usuario,
-                    usuario_id:consulta_correo[0].id
+                    id:consulta_correo[0].id
             }
 
             const token = jwt.sign(payload, CLAVE_SECRETA, {expiresIn:'2h'} )
 
-                res.json({
+                res.status(200).json({
                     mensaje: "La contraseña coincide",
                     correo: correo_usuario,
                     token:token
-                }).status(200);
+                });
             } else{
 
-                res.json({
+                res.status(401).json({
                     mensaje: "La contraseña no coincide"
-                }).status(401)
+                })
             }
         } else{
 
-            res.json({
+            res.status(401).json({
                 error: `No se encontro ninguna coincidencia`
-            }).status(401)
+            })
         }
     })
 
@@ -122,13 +122,13 @@ app.post("/tareas", async (req, res) =>{
     
     if (insert_tarea){
 
-        res.json({
+        res.status(201).json({
             mensaje:"Se creo la tarea exitosamente"
-        }).status(201);
+        });
     } else{
-        res.json({
+        res.status(401).json({
             error : "No se creo la tarea"
-        }).status(401)
+        })
     }
     }catch(e){ 
 
@@ -146,10 +146,16 @@ app.get("/tareas/:usuarioId", async (req,res) =>{
 
     const id_usuario = req.params.usuarioId;
     
+
     const consulta_tareas = 'SELECT texto FROM tareas WHERE usuario_id = ?';
 
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]
     try{
+        
+        const token_verificar = jwt.verify(token, CLAVE_SECRETA);
 
+        if(token_verificar){
         const [resultados] = await connection.execute(consulta_tareas, [id_usuario]);
 
         res.status(200).json({
@@ -157,8 +163,10 @@ app.get("/tareas/:usuarioId", async (req,res) =>{
             tareas: resultados
         })
 
+        }
+
     }catch(e){
-        res.status(404).json({
+        res.status(401).json({
             error:`Hubo un error al Obtener tus tareas: ${e}`
         });
     }
@@ -171,7 +179,19 @@ app.delete("/tareas/:id", async (req, res) =>{
 
     const id_tarea = req.params.id;
 
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
     try{
+
+        if(!token){
+            return res.status(401).json({error: "Token no proporcionado"});
+        }
+
+        const token_verificar = jwt.verify(token, CLAVE_SECRETA);
+        
+        if(token_verificar){
+            
         const sql_consulta = 'DELETE FROM tareas WHERE id = ?'
 
     const [resultado] = await connection.execute(sql_consulta, [id_tarea]);
@@ -179,8 +199,11 @@ app.delete("/tareas/:id", async (req, res) =>{
     res.status(200).json({
         mensaje: "Se elimino la tarea con exito"
     });
+
+    
+        }
     }catch(e){
-        res.status(404).json({
+        res.status(401).json({
             error:`No se elimino la tarea de manera correcta: ${e}`
         });
     }
