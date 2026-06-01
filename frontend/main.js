@@ -18,14 +18,19 @@ formulario.addEventListener("submit", async (event) =>{
 
     /*🌟 validacion de contraseña */
     if(respuestaServidor.mensaje == "La contraseña coincide"){
+        localStorage.clear();
 
-        localStorage.setItem("usuarioId", respuestaServidor.usuario_id);
+        localStorage.setItem("token", respuestaServidor.token);
+
+        localStorage.setItem("usuarioId", respuestaServidor.correo);
         
     notificacion.textContent= "Sesion exitosa";
     notificacion.style.color = "green";
-    window.location.href = "dashboard.html"
 
     console.log("Respuesta del Servidor: ", respuestaServidor)
+    window.location.href = "dashboard.html"
+
+    
     } else{
         notificacion.textContent= "Sesion negada";
     notificacion.style.color = "red";

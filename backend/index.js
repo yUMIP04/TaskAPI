@@ -142,35 +142,37 @@ app.post("/tareas", async (req, res) =>{
 
 /*🌟OBTENER TAREAS */
 
-app.get("/tareas/:usuarioId", async (req,res) =>{
-
-    const id_usuario = req.params.usuarioId;
+app.get("/obtener-tareas", async (req,res) =>{
     
-
-    const consulta_tareas = 'SELECT texto FROM tareas WHERE usuario_id = ?';
-
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]
+    const token = authHeader && authHeader.split(' ')[1];
+
     try{
-        
-        const token_verificar = jwt.verify(token, CLAVE_SECRETA);
 
-        if(token_verificar){
-        const [resultados] = await connection.execute(consulta_tareas, [id_usuario]);
-
-        res.status(200).json({
-            mensaje: `Se encontraron tus tareas`,
-            tareas: resultados
-        })
-
+        if(!token){
+            return res.status(401).json({error:"Token no proporcionado"})
         }
 
+        const token_Verificar = jwt.verify(token, CLAVE_SECRETA);
+
+        if(token_Verificar){
+
+            const id_usuario = token_Verificar.id;
+            const consulta = "SELECT id,texto FROM tareas WHERE usuario_id = ?"
+
+            const [resultados] = await connection.execute(consulta, [id_usuario]);
+
+            return res.status(200).json({
+                mensajes:"Se encontraron tareas",
+                tareas:resultados
+            })
+        }
     }catch(e){
-        res.status(401).json({
-            error:`Hubo un error al Obtener tus tareas: ${e}`
+        console.error(e);
+        return res.status(401).json({
+            erro:"Tokeb invalido, expirado o error al obtener tareas"
         });
     }
-    
 })
 
 /*🌟ELIMINAR TAREAS */
@@ -197,7 +199,7 @@ app.delete("/tareas/:id", async (req, res) =>{
     const [resultado] = await connection.execute(sql_consulta, [id_tarea]);
 
     res.status(200).json({
-        mensaje: "Se elimino la tarea con exito"
+        mensaje: "Se eliminó la tarea con éxito"
     });
 
     

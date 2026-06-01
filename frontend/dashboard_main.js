@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const id_usuario_logueado = localStorage.getItem("usuarioId");
 
     if (id_usuario_logueado) {
-        const resultado = await PintarTareas(id_usuario_logueado);
+        const resultado = await PintarTareas();
 
         if (resultado && resultado.tareas) {
             
@@ -69,10 +69,10 @@ btn_agregar.addEventListener("click", async () => {
 
 
     const valor_txt = nueva_tarea.value;
-    const idUsuarioLogueado = localStorage.getItem("usuarioId");
+   
 
     if(valor_txt.trim() !== ""){
-        const respuesta = await AgregarTareas(valor_txt, idUsuarioLogueado);
+        const respuesta = await AgregarTareas(valor_txt);
 
         if(respuesta && respuesta.mensaje === "Se creo la tarea exitosamente"){
             Pintar_Tareas(valor_txt, respuesta.id_tarea);
@@ -87,14 +87,21 @@ btn_agregar.addEventListener("click", async () => {
 /*🌟FUNCIONES DE LAS APIS */
 
 async function EliminarTarea(id_Tarea) {
+
+    const token = localStorage.getItem("token");
+
     try{
 
         const ApiTarea = await fetch(`http://localhost:3000/tareas/${id_Tarea}`,{
-
+        
             method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
 
         const datos = await ApiTarea.json();
+        return datos;
     }catch(e){
         console.error(`Hubo un error al eliminar la tarea: ${e}`);
     }
@@ -104,8 +111,16 @@ async function EliminarTarea(id_Tarea) {
 async function PintarTareas(usuario_id) {
     
     try{
-        const ApiTareas = await fetch(`http://localhost:3000/tareas/${usuario_id}`, {
+
+        const token = localStorage.getItem("token");
+
+        const ApiTareas = await fetch(`http://localhost:3000/obtener-tareas`, {
             method:'GET',
+
+            headers:{
+                'Authorization': `Bearer ${token}`
+            }
+
         });
 
         const datos = await ApiTareas.json();
@@ -117,9 +132,11 @@ async function PintarTareas(usuario_id) {
 
 /*agregar tareas */
 
-async function AgregarTareas(texto, usuarioID) {
+async function AgregarTareas(texto ) {
     
     try{
+
+        const token = localStorage.getItem("token");
 
         const APITareas = await fetch('http://localhost:3000/tareas',{
             method: 'POST',
@@ -129,7 +146,7 @@ async function AgregarTareas(texto, usuarioID) {
 
             body:JSON.stringify({
                 texto:texto, 
-                usuario_id:usuarioID})
+                token:token})
         });
 
         const datos = await APITareas.json();
