@@ -58,7 +58,7 @@ app.post("/registro", async (req, res) =>{
 
         if(consulta_correo.length > 0){
 
-            /*res.status(200);*/
+        
 
             /*validacion de contraseña */
 

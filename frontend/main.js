@@ -17,7 +17,7 @@ formulario.addEventListener("submit", async (event) =>{
     const respuestaServidor = await FormularioLogin(valorCorreo, valorPass);
 
     /*🌟 validacion de contraseña */
-    if(respuestaServidor.mensaje == "La contraseña coincide"){
+    if(respuestaServidor.mensaje == "La contraseña coincide" && respuestaServidor.correo == valorCorreo){
         localStorage.clear();
 
         localStorage.setItem("token", respuestaServidor.token);
