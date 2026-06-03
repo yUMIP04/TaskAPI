@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+</head>
+<body>
+    
+    <form id="Registrar-form" action="" method="post">
+    <div class="registro-form">
+        <div class="titulo-registro">
+            <h1>Registro</h1>
+        </div>
+
+        <div class="form-container">
+            <label for="email">Correo electronico:</label>
+            <input type="email" name="email" id="email-input" required>
+            <label for="password">Contraseña:</label>
+            <input type="password" name="password" id="password-input" maxlength="8" required>
+            <label for="password-confirm">Confirmacion de contraseña:</label>
+            <input type="password" name="password-confirm" maxlength="8" id="password-confirm-input">
+        </div>
+
+        <div class="container-button">
+            <input type="submit" value="Registrar">
+        </div>
+
+    </div>
+
+    </form>
+</body>
+
+<script type="module" src="registro.js"></script>
+</html>
