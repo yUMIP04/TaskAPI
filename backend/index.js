@@ -3,12 +3,14 @@ import cors from "cors";
 import connection from './db.js';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"
+import 'dotenv/config';
 
-const CLAVE_SECRETA =  "VictoriaGalletaLaneyYumiLunaBrisaYokoYEMOreoWaltKATSUMOTO"
+const CLAVE_SECRETA =  process.env.JWT_SECRET;
 const app = express();
 app.use(cors());
 
 app.use(express.json())
+
 
 /*🌟 RUTA DEL SERVIDOR */
 app.get("/", (req, res) => {

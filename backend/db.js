@@ -1,14 +1,15 @@
 import mysql from 'mysql2/promise'
+import 'dotenv/config';
 
 let connection;
 try{ 
 
 connection = await mysql.createConnection({
     
-    host:'localhost',
-    user:'root',
-    password:'',
-    database:'taskflowapi'
+    host:process.env.HOSTDB,
+    user:process.env.USERDB,
+    password:process.env.passwordDB,
+    database:process.env.DATABASE
 
 });
 
