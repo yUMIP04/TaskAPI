@@ -141,12 +141,12 @@ async function AgregarTareas(texto ) {
         const APITareas = await fetch('http://localhost:3000/tareas',{
             method: 'POST',
             headers:{
-                'Content-Type':'application/json'
+                'Content-Type':'application/json',
+                'Authorization': `Bearer ${token}`
             },
 
             body:JSON.stringify({
-                texto:texto, 
-                token:token})
+                texto:texto})
         });
 
         const datos = await APITareas.json();
