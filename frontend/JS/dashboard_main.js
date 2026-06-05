@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     } else {
         alert("No has iniciado sesión, regresando al login...");
-        window.location.href = "index.html";
+        window.location.href = "../index.html";
     }
 });
 

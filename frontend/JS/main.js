@@ -28,7 +28,7 @@ formulario.addEventListener("submit", async (event) =>{
     notificacion.style.color = "green";
 
     console.log("Respuesta del Servidor: ", respuestaServidor)
-    window.location.href = "dashboard.html"
+    window.location.href = "views/dashboard.html"
 
     
     } else{
