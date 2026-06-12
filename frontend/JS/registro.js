@@ -22,7 +22,7 @@ function Registrar_Usuario(correo, password, confirm_password, formulario){
 
                 alert("Se ha registrado exitosamente tu usuario");
 
-                window.location.href= 'index.html';
+                window.location.href= '../index.html';
             } else{
                 alert("Por favor llenar bien los campos, las contraseñas no coinciden, minimo 8 caracteres.");
             }

@@ -13,6 +13,7 @@ function Pintar_Tareas(texto, id_Tarea = null) {
             btn_eliminar.textContent = "Eliminar";
             tarea.textContent = texto + " "; 
             
+            tarea.className = "flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm";
             tarea.appendChild(btn_eliminar);
             ul.appendChild(tarea);
             div_Tareas.appendChild(ul);

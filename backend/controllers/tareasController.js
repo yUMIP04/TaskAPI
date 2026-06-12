@@ -1,10 +1,10 @@
-/* 🧠 CONTROLADOR DE TAREAS */
+
 import connection from "../db/db.js";
 
-// 1. OBTENER / PINTAR TAREAS
+
 const obtenerTareas = async (req, res) => {
     try {
-        // El id viene del guardia (middleware) que descifró el token
+       
         const id_usuario = req.usuario.id; 
         const consulta = "SELECT id, texto FROM tareas WHERE usuario_id = ?";
 
@@ -22,7 +22,7 @@ const obtenerTareas = async (req, res) => {
     }
 };
 
-// 2. AGREGAR TAREA
+
 const agregarTarea = async (req, res) => {
     try {
         const texto_tarea = req.body.texto;
@@ -50,7 +50,7 @@ const agregarTarea = async (req, res) => {
     }
 };
 
-// 3. ELIMINAR TAREA
+
 const eliminarTarea = async (req, res) => {
     const id_tarea = req.params.id;
 
@@ -68,5 +68,4 @@ const eliminarTarea = async (req, res) => {
     }
 };
 
-// Exportamos las tres funciones juntas
 export { obtenerTareas, agregarTarea, eliminarTarea };
