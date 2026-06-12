@@ -27,19 +27,21 @@ const agregarTarea = async (req, res) => {
     try {
         const texto_tarea = req.body.texto;
         const id_usuario = req.usuario.id;
+        const fecha_limite = req.body.fecha_limite;
         const estado = "Pendiente";
 
         if (!texto_tarea) {
             return res.status(400).json({ error: "Falta el texto de la tarea" });
         }
 
-        const consulta_tareaInsert = 'INSERT INTO tareas (texto, completada, usuario_id) VALUES(?, ?, ?)';
-        const [resultado] = await connection.execute(consulta_tareaInsert, [texto_tarea, estado, id_usuario]);
+        const consulta_tareaInsert = 'INSERT INTO tareas (texto, completada, usuario_id, fecha_limite) VALUES(?, ?, ?, ?)';
+        const fecha_final =(fecha_limite && fecha_limite.trim() !== "") ? fecha_limite : null;
+        const [resultado] = await connection.execute(consulta_tareaInsert, [texto_tarea, estado, id_usuario, fecha_final]);
 
         if (resultado) {
             res.status(201).json({
                 mensaje: "Se creo la tarea exitosamente",
-                id_tarea: resultado.insertId // Pasamos el ID para tu botón eliminar del front
+                id_tarea: resultado.insertId
             });
         } else {
             res.status(400).json({ error: "No se creo la tarea" });
