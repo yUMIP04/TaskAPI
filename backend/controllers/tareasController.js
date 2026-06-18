@@ -92,7 +92,7 @@ const buscarTarea = async (req,res) => {
         
         res.status(200).json({
             mensaje: "Se encontro una coincidencia",
-            texto: resultados
+            tareas: resultados
         })
     }catch(e){
         console.error(`Hubo un error al buscar la tarea en la BD: ${e}`);

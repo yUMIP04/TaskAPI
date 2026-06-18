@@ -3,7 +3,8 @@ const btn_agregar = document.getElementById("agregar_tarea")
 const div_Tareas = document.getElementById("list-tareas");
 const ul = document.getElementById("contenedor-li");
 const input_fecha = document.getElementById("fecha_limite");
-
+const input_busqueda = document.getElementById("buscar_tarea");
+let temporizadorBusqueda;
 
 /*🌟Funcion para pintar tareas */
 function Pintar_Tareas(texto, id_Tarea = null, fecha_limite = null) { 
@@ -127,28 +128,29 @@ function Pintar_Tareas(texto, id_Tarea = null, fecha_limite = null) {
     }
 }
 
+async function CargarYRenderizarTodo() {
+    const resultado = await PintarTareas();
+    if (resultado && resultado.tareas) {
+        div_Tareas.innerHTML = "";
+        ul.innerHTML = ""; 
+        resultado.tareas.forEach(tarea => {
+            Pintar_Tareas(tarea.texto, tarea.id, tarea.fecha_limite); 
+        });
+    }
+}
+
 /* 🌟 Cargar tareas del servidor al iniciar */
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async () =>{
     const id_usuario_logueado = localStorage.getItem("usuarioId");
 
-    if (id_usuario_logueado) {
-        const resultado = await PintarTareas();
+    if(id_usuario_logueado){
 
-        if (resultado && resultado.tareas) {
-            
-            div_Tareas.innerHTML = "";
-            ul.innerHTML = ""; 
-
-           
-            resultado.tareas.forEach(tarea => {
-                Pintar_Tareas(tarea.texto, tarea.id); 
-            });
-        }
-    } else {
-        alert("No has iniciado sesión, regresando al login...");
-        window.location.href = "../index.html";
+        await CargarYRenderizarTodo();
+    } else{
+        alert("No has iniciado sesion, regresando al login...");
+        window.location.href= "../index.html"
     }
-});
+})
 
 /*Boton para agregar */
 btn_agregar.addEventListener("click", async () => {
@@ -161,9 +163,9 @@ btn_agregar.addEventListener("click", async () => {
         const respuesta = await AgregarTareas(valor_txt, fecha_limite);
 
         if(respuesta && respuesta.mensaje === "Se creo la tarea exitosamente"){
-            Pintar_Tareas(valor_txt, respuesta.id_tarea);
+           Pintar_Tareas(valor_txt, respuesta.id_tarea, fecha_limite);
              nueva_tarea.value = "";
-             input_fecha = "";
+             input_fecha.value = "";
         }
     } else{
         alert("El campo esta vacio");
@@ -171,6 +173,39 @@ btn_agregar.addEventListener("click", async () => {
    
 });
 
+
+input_busqueda.addEventListener("input", () => {
+
+    clearTimeout(temporizadorBusqueda);
+
+    const text_busqueda = input_busqueda.value.trim();
+
+    if (text_busqueda == ""){
+        ul.innerHTML = "";
+       CargarYRenderizarTodo();
+        return;
+    }
+
+    temporizadorBusqueda = setTimeout ( async () =>{
+        console.log("Buscando en tiempo real", text_busqueda);
+
+        const respuesta = await BuscarTarea(text_busqueda);
+
+        ul.innerHTML = "";
+
+        if(respuesta && respuesta.tareas) {
+            respuesta.tareas.forEach(tarea =>{
+
+                Pintar_Tareas(tarea.texto, tarea.id, tarea.fecha_limite);
+            });
+        } else{
+            const sinResultados = document.createElement("p");
+            sinResultados.textContent = "No se encontro coincidencias";
+            sinResultados.className = "text-center text-sm text-slate-400 py-4";
+            ul.appendChild(sinResultados);
+        }
+    }, 300);
+});
 /*🌟FUNCIONES DE LAS APIS */
 
 async function EliminarTarea(id_Tarea) {
@@ -252,7 +287,9 @@ async function BuscarTarea(txt) {
     try{
         const token = localStorage.getItem("token");
 
-        const APITareas = await fetch(`http://localhost:3000/buscar-tareas?nombre=${encodeURIComponent(txt)}`,
+        const timestamp = new Date().getTime();
+
+        const APITareas = await fetch(`http://localhost:3000/buscar-tareas?nombre=${encodeURIComponent(txt)}&_t=${timestamp}`,
             {
                 method:'GET',
 
