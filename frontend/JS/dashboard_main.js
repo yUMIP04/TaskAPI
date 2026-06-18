@@ -4,9 +4,9 @@ const div_Tareas = document.getElementById("list-tareas");
 const ul = document.getElementById("contenedor-li");
 const input_fecha = document.getElementById("fecha_limite");
 
+
 /*🌟Funcion para pintar tareas */
-/*🌟Funcion para pintar tareas */
-function Pintar_Tareas(texto, id_Tarea = null, fecha_limite = null) { // 📅 Agregamos fecha_limite como parámetro
+function Pintar_Tareas(texto, id_Tarea = null, fecha_limite = null) { 
     try {
         if (texto) {
             const tarea = document.createElement("li");
@@ -17,51 +17,49 @@ function Pintar_Tareas(texto, id_Tarea = null, fecha_limite = null) { // 📅 Ag
             check_tareaTerminada.type = 'checkbox';
             btn_eliminar.textContent = "Eliminar";
             
-            // ❌ QUITAMOS: tarea.textContent = texto + " "; (Para que no se amontone todo feo)
+          
 
-            // 🏢 1. NUEVO: Creamos un contenedor vertical con Flexbox para el texto y las fechas
+          
             const bloqueContenido = document.createElement("div");
             bloqueContenido.className = "flex-1 flex flex-col ml-3 gap-0.5"; 
 
-            // El texto de la tarea
+           
             const contenedorTexto = document.createElement("span");
             contenedorTexto.textContent = texto;
             contenedorTexto.className = "text-slate-700 font-medium text-sm transition-all";
 
-            // El renglón de las fechas (Letras chiquitas y discretas)
+           
             const contenedorFechas = document.createElement("div");
             contenedorFechas.className = "text-[11px] text-slate-400 flex flex-wrap gap-x-2";
             
-            // Formateamos la fecha de creación a algo amigable (Ej: 11/6/2026)
+            
             const hoy = new Date().toLocaleDateString();
             contenedorFechas.textContent = `📅 Creada: ${hoy}`;
 
-            // Si viene una fecha límite de la base de datos, la agregamos al renglón
+           
             if (fecha_limite) {
-                // Limpiamos el formato de MySQL si viene completo (YYYY-MM-DDTHH:mm:ss...) a solo YYYY-MM-DD
+              
                 const fechaLimpia = fecha_limite.split('T')[0];
                 contenedorFechas.textContent += ` ⚠️ Vence: ${fechaLimpia}`;
             }
 
-            // Metemos el texto y las fechas dentro del bloque vertical
+            
             bloqueContenido.appendChild(contenedorTexto);
             bloqueContenido.appendChild(contenedorFechas);
             
-            // Estilos de la tarjeta
+          
             tarea.className = "flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm";
             
-            // 🏢 2. NUEVO ORDEN DE ENSAMBLE: Los checks primero, luego el bloque vertical y al final el botón
+           
             tarea.prepend(check_tareaPrioridad);
             tarea.prepend(check_tareaTerminada);
-            tarea.appendChild(bloqueContenido); // 👈 El bloque entra aquí en medio
+            tarea.appendChild(bloqueContenido); 
             tarea.appendChild(btn_eliminar);
             
             ul.appendChild(tarea);
             div_Tareas.appendChild(ul);
 
-            // ==========================================
-            // 🔒 TODO TU CÓDIGO DE LOCALSTORAGE Y APIS SE QUEDA EXACTAMENTE IGUAL ABAJO:
-            // ==========================================
+          
             const estadoGuardado = localStorage.getItem(`tarea${id_Tarea}_completada`);
             const prioridadGuardada = localStorage.getItem(`tarea${id_Tarea}_prioridad`);
             if(estadoGuardado === "true"){
@@ -245,4 +243,31 @@ async function AgregarTareas(texto, fecha_limite ) {
     }catch(e){
         console.error(`Hubo un error al agregar la tarea: ${e}`);
     }
+}
+
+/*Buscar Tarea */
+
+async function BuscarTarea(txt) {
+
+    try{
+        const token = localStorage.getItem("token");
+
+        const APITareas = await fetch(`http://localhost:3000/buscar-tareas?nombre=${encodeURIComponent(txt)}`,
+            {
+                method:'GET',
+
+                headers:{
+                     'Authorization': `Bearer ${token}`
+                }
+            },
+
+        )
+
+        const datos = await APITareas.json();
+        return datos;
+    }catch(e){
+
+        console.error(`Hubo un error al buscar la tarea: ${e}`);
+    }
+    
 }

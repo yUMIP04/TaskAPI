@@ -70,4 +70,36 @@ const eliminarTarea = async (req, res) => {
     }
 };
 
-export { obtenerTareas, agregarTarea, eliminarTarea };
+const buscarTarea = async (req,res) => {
+    const nombre_tarea = req.query.nombre;
+    const id_usuario = req.usuario.id;
+    try{
+
+        if (!nombre_tarea || nombre_tarea.trim() === ""){
+
+            return res.status(400).json({
+                error: "Debes ingresar un termino de busqueda"
+            });
+        }
+        const sql_consulta = 'SELECT * FROM tareas WHERE usuario_id = ? AND texto LIKE ?'
+        const [resultados] = await connection.execute(sql_consulta, [id_usuario, `%${nombre_tarea}%`]);
+
+        if (resultados.length === 0){
+            return res.status(404).json({
+                mensaje: "No se encontraron tareas que coincidan"
+            });
+        }
+        
+        res.status(200).json({
+            mensaje: "Se encontro una coincidencia",
+            texto: resultados
+        })
+    }catch(e){
+        console.error(`Hubo un error al buscar la tarea en la BD: ${e}`);
+        res.status(500).json({
+            error:`No se encontro ninguna coincidencia`
+        });
+    }
+}
+
+export { obtenerTareas, agregarTarea, eliminarTarea, buscarTarea };
